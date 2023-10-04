@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Copyright Humbly Arrogant Software Limited 2020-2023.
+ *
+ * Use of this software is governed by the Business Source License included in the LICENSE file and at https://getparthenon.com/docs/next/license.
+ *
+ * Change Date: 26.06.2026 ( 3 years after 2.2.0 release )
+ *
+ * On the date above, in accordance with the Business Source License, use of this software will be governed by the open source license specified in the LICENSE file.
+ */
+
+namespace Parthenon\User\Repository;
+
+use Parthenon\Common\Exception\NoEntityFoundException;
+use Parthenon\Common\Repository\OdmRepository;
+use Parthenon\User\Entity\ForgotPasswordCode;
+
+class ForgotPasswordCodeOdmRepository extends OdmRepository implements ForgotPasswordCodeRepositoryInterface
+{
+    public function findActiveByCode($code): ForgotPasswordCode
+    {
+        $passwordReset = $this->documentRepository->findOneBy(['code' => $code, 'used' => false]);
+
+        if (!$passwordReset instanceof ForgotPasswordCode) {
+            throw new NoEntityFoundException();
+        }
+
+        return $passwordReset;
+    }
+}

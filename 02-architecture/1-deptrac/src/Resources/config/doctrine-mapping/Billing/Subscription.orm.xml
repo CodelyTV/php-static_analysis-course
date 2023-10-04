@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <mapped-superclass name="Parthenon\Billing\Entity\Subscription">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM" />
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
+        </id>
+        <many-to-one field="customer" target-entity="Parthenon\Billing\Entity\CustomerInterface" />
+        <field name="planName" column="plan_name" type="string" nullable="true"  />
+        <field name="paymentSchedule" column="payment_schedule" type="string"  nullable="true"  />
+        <field name="seats" column="seats" type="integer" nullable="true" />
+        <field name="active" column="active" type="boolean" nullable="true"  />
+        <field name="status" column="status" type="string" nullable="false" enum-type="Parthenon\Billing\Enum\SubscriptionStatus"  />
+        <field name="amount" column="amount" type="integer" nullable="true"/>
+        <field name="hasTrial" column="has_trial" type="boolean" nullable="false" />
+        <field name="trialLengthDays" column="trial_length_days" type="integer" nullable="true"/>
+        <field name="currency" column="currency" type="string" nullable="true" />
+        <field name="mainExternalReference" column="main_external_reference" type="string" nullable="true" />
+        <field name="mainExternalReferenceDetailsUrl" column="main_external_reference_details_url" type="string" nullable="true" />
+        <field name="childExternalReference" column="child_external_reference" type="string" nullable="true" />
+        <many-to-one field="paymentDetails" target-entity="Parthenon\Billing\Entity\PaymentCard" />
+        <many-to-one field="price" target-entity="Parthenon\Billing\Entity\PriceInterface" />
+        <many-to-one field="subscriptionPlan" target-entity="Parthenon\Billing\Entity\SubscriptionPlanInterface" />
+        <field name="createdAt" column="started_at" type="datetime" nullable="true"  />
+        <field name="validUntil" column="valid_until" type="datetime" nullable="true" />
+        <field name="startOfCurrentPeriod" column="start_of_current_period" type="datetime" nullable="true" />
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="true" />
+        <field name="endedAt" column="ended_at" type="datetime" nullable="true" />
+        <many-to-many field="payments" target-entity="Parthenon\Billing\Entity\PaymentInterface" fetch="EXTRA_LAZY">
+            <join-table name="subscription_payment">
+                <join-columns>
+                    <join-column name="subscription_id" referenced-column-name="id" />
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="payment_id" referenced-column-name="id" />
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+    </mapped-superclass>
+</doctrine-mapping>

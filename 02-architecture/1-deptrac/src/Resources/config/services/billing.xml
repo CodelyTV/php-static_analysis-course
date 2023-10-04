@@ -1,0 +1,283 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults autoconfigure="true" />
+
+        <prototype namespace="Parthenon\Billing\Controller\" resource="../../Billing/Controller/*">
+            <tag name="controller.service_arguments"/>
+        </prototype>
+
+        <service id="Obol\Provider\ProviderInterface" class="Obol\Provider\ProviderInterface">
+            <factory class="Obol\Factory" method="create" />
+            <argument>%parthenon_billing_payments_obol_config%</argument>
+        </service>
+
+        <service id="Parthenon\Billing\UserCustomerProvider" class="Parthenon\Billing\UserCustomerProvider">
+            <argument type="service" id="Symfony\Component\Security\Core\Security" />
+        </service>
+
+        <service id="Parthenon\Billing\TeamCustomerProvider" class="Parthenon\Billing\TeamCustomerProvider">
+            <argument type="service" id="Symfony\Component\Security\Core\Security" />
+            <argument type="service" id="Parthenon\User\Repository\TeamRepositoryInterface" />
+        </service>
+
+
+        <service id="Parthenon\Billing\Athena\CustomerUserSection" class="Parthenon\Billing\Athena\CustomerUserSection">
+            <argument type="service"  id="Parthenon\Billing\Repository\CustomerRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\PlanManagerInterface" />
+        </service>
+        <service id="Parthenon\Billing\Athena\CustomerTeamSection" class="Parthenon\Billing\Athena\CustomerTeamSection">
+            <argument type="service"  id="Parthenon\Billing\Repository\CustomerRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\PlanManagerInterface" />
+        </service>
+
+        <!-- Commands -->
+        <service id="Parthenon\Billing\Command\DailyChargeBackCommand" class="Parthenon\Billing\Command\DailyChargeBackCommand">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\ChargeBack\ChargeBackSyncerInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\ChargeBackRepositoryInterface" />
+            <tag name="console.command"  />
+        </service>
+
+
+        <!-- Plans -->
+
+        <service id="Parthenon\Billing\Plan\PlanManager" class="Parthenon\Billing\Plan\PlanManager">
+            <argument>%parthenon_billing_plan_plans%</argument>
+            <argument type="service" id="Parthenon\Billing\Repository\CustomerRepositoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Plan\DatabasePlanManager" class="Parthenon\Billing\Plan\DatabasePlanManager">
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionPlanRepositoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Plan\CachedPlanManager" class="Parthenon\Billing\Plan\CachedPlanManager">
+            <argument type="service" id="Parthenon\Billing\Plan\DatabasePlanManager" />
+            <argument type="service" id="Redis" />
+
+        </service>
+        <service id="Parthenon\Billing\Plan\PlanManagerInterface" alias="Parthenon\Billing\Plan\CachedPlanManager" />
+
+        <service id="parthenon.payments.plan.counter_manager" class="Parthenon\Billing\Plan\CounterManager">
+        </service>
+        <service id="Parthenon\Billing\Plan\CounterManager" alias="parthenon.payments.plan.counter_manager" />
+
+        <service id="parthenon.plan.security.voter.plan_feature" class="Parthenon\Billing\Plan\Security\Voter\PlanFeatureVoter">
+            <argument type="service" id="Parthenon\Billing\CustomerProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\CustomerPlanInfoInterface" />
+            <tag name="security.voter" priority="20"/>
+        </service>
+
+        <service id="parthenon.plan.security.voter.plan" class="Parthenon\Billing\Plan\Security\Voter\PlanVoter">
+            <argument type="service" id="Parthenon\Billing\Plan\CounterManager" />
+            <argument type="service" id="Parthenon\Billing\CustomerProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\CustomerPlanInfoInterface" />
+            <tag name="security.voter" priority="20"/>
+        </service>
+        <service id="Parthenon\Billing\Plan\Security\Voter\PlanVoter" alias="parthenon.plan.security.voter.plan" />
+
+        <service id="parthenon.plan.security.voter.invite" class="Parthenon\Billing\Plan\Security\Voter\InviteVoter">
+            <argument type="service" id="Parthenon\Billing\Plan\Counter\TeamInviteCounterInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\PlanManagerInterface" />
+            <argument type="service" id="Parthenon\Billing\CustomerProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" />
+            <tag name="security.voter" priority="20"/>
+        </service>
+        <service id="Parthenon\Billing\Plan\Security\Voter\InviteVoter" alias="parthenon.plan.security.voter.invite" />
+
+        <service id="Parthenon\Billing\Plan\Counter\TeamInviteCounter" class="Parthenon\Billing\Plan\Counter\TeamInviteCounter">
+            <argument type="service" id="Parthenon\User\Repository\TeamInviteCodeRepositoryInterface" />
+            <argument type="service" id="Parthenon\User\Repository\ActiveMembersRepositoryInterface" />
+            <argument type="service" id="Parthenon\User\Repository\TeamRepositoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Plan\Counter\TeamInviteCounterInterface" alias="Parthenon\Billing\Plan\Counter\TeamInviteCounter" />
+
+        <service id="Parthenon\Billing\Obol\CustomerConverter" class="Parthenon\Billing\Obol\CustomerConverter">
+        </service>
+        <service id="Parthenon\Billing\Obol\CustomerConverterInterface" alias="Parthenon\Billing\Obol\CustomerConverter" />
+
+        <service id="Parthenon\Billing\Config\FrontendConfig" class="Parthenon\Billing\Config\FrontendConfig">
+            <argument>%parthenon_billing_config_frontend_info%</argument>
+        </service>
+        <service id="Parthenon\Billing\Config\WebhookConfig" class="Parthenon\Billing\Config\WebhookConfig">
+            <argument>%parthenon_billing_config_webhook_secret%</argument>
+        </service>
+
+        <service id="Parthenon\Billing\Factory\PaymentMethodFactory" class="Parthenon\Billing\Factory\PaymentMethodFactory" />
+        <service id="Parthenon\Billing\Factory\PaymentMethodFactoryInterface" alias="Parthenon\Billing\Factory\PaymentMethodFactory" />
+
+        <service id="Parthenon\Billing\Factory\EntityFactory" class="Parthenon\Billing\Factory\EntityFactory" />
+        <service id="Parthenon\Billing\Factory\EntityFactoryInterface" alias="Parthenon\Billing\Factory\EntityFactory" />
+
+        <!-- OBOL -->
+        <service id="Parthenon\Billing\Obol\BillingDetailsFactory" class="Parthenon\Billing\Obol\BillingDetailsFactory" />
+        <service id="Parthenon\Billing\Obol\BillingDetailsFactoryInterface" alias="Parthenon\Billing\Obol\BillingDetailsFactory" />
+
+        <service id="Parthenon\Billing\Obol\CustomerConverter" class="Parthenon\Billing\Obol\CustomerConverter" />
+        <service id="Parthenon\Billing\Obol\CustomerConverterInterface" alias="Parthenon\Billing\Obol\CustomerConverter" />
+
+        <service id="Parthenon\Billing\Obol\PaymentFactory" class="Parthenon\Billing\Obol\PaymentFactory">
+            <argument type="service" id="Parthenon\Billing\CustomerProviderInterface" />
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Obol\PaymentFactoryInterface" alias="Parthenon\Billing\Obol\PaymentFactory" />
+
+        <service id="Parthenon\Billing\Obol\SubscriptionFactory" class="Parthenon\Billing\Obol\SubscriptionFactory">
+            <argument type="service" id="Parthenon\Billing\Obol\BillingDetailsFactoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Obol\SubscriptionFactoryInterface" alias="Parthenon\Billing\Obol\SubscriptionFactory" />
+
+        <service id="Parthenon\Billing\Obol\PriceRegister" class="Parthenon\Billing\Obol\PriceRegister">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+        </service>
+        <service id="Parthenon\Billing\Obol\PriceRegisterInterface" alias="Parthenon\Billing\Obol\PriceRegister" />
+        <service id="Parthenon\Billing\Obol\ProductRegister" class="Parthenon\Billing\Obol\ProductRegister">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+        </service>
+        <service id="Parthenon\Billing\Obol\ProductRegisterInterface" alias="Parthenon\Billing\Obol\ProductRegister" />
+
+        <!-- Athena -->
+        <service id="Parthenon\Billing\Athena\PaymentSection" class="Parthenon\Billing\Athena\PaymentSection">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Athena\SubscriptionSection" class="Parthenon\Billing\Athena\SubscriptionSection">
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Athena\RefundSection" class="Parthenon\Billing\Athena\RefundSection">
+            <argument type="service" id="Parthenon\Billing\Repository\RefundRepositoryInterface" />
+        </service>
+
+        <service id="Parthenon\Billing\Customer\CustomerManager" class="Parthenon\Billing\Customer\CustomerManager">
+            <argument type="service" id="Parthenon\Billing\Repository\CustomerRepositoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\Customer\CustomerManagerInterface" alias="Parthenon\Billing\Customer\CustomerManager" />
+
+        <!-- Webhook -->
+        <service id="Parthenon\Billing\Webhook\HandlerManager" class="Parthenon\Billing\Webhook\HandlerManager" />
+        <service id="Parthenon\Billing\Webhook\HandlerManagerInterface" alias="Parthenon\Billing\Webhook\HandlerManager" />
+
+        <service id="Parthenon\Billing\Webhook\RequestProcessor" class="Parthenon\Billing\Webhook\RequestProcessor">
+            <argument type="service" id="Parthenon\Billing\Config\WebhookConfig" />
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Webhook\HandlerManagerInterface" />
+        </service>
+        <service id="Parthenon\Billing\Webhook\RequestProcessorInterface" alias="Parthenon\Billing\Webhook\RequestProcessor" />
+
+        <service id="Parthenon\Billing\Webhook\Handler\ChargeSucceededHandler" class="Parthenon\Billing\Webhook\Handler\ChargeSucceededHandler">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Customer\CustomerManagerInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\PaymentFactoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Subscription\PaymentLinkerInterface" />
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface" />
+            <argument type="service" id="Parthenon\Billing\Subscription\SchedulerInterface" />
+            <call method="setLogger">
+                <argument type="service" id="logger" />
+            </call>
+        </service>
+        <service id="Parthenon\Billing\Webhook\Handler\ChargeBackHandler" class="Parthenon\Billing\Webhook\Handler\ChargeBackHandler">
+            <argument type="service" id="Parthenon\Billing\ChargeBack\ChargeBackSyncerInterface" />
+        </service>
+
+        <!-- Receipt -->
+        <service id="Parthenon\Billing\Receipt\ReceiptGenerator" class="Parthenon\Billing\Receipt\ReceiptGenerator">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Tax\TaxCalculatorInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactory" />
+        </service>
+        <service id="Parthenon\Billing\Receipt\ReceiptGeneratorInterface" alias="Parthenon\Billing\Receipt\ReceiptGenerator" />
+
+
+        <!-- Tax -->
+        <service id="Parthenon\Billing\Tax\CountryRules" class="Parthenon\Billing\Tax\CountryRules" />
+        <service id="Parthenon\Billing\Tax\CountryRulesInterface" alias="Parthenon\Billing\Tax\CountryRules" />
+
+        <service id="Parthenon\Billing\Tax\TaxCalculator" class="Parthenon\Billing\Tax\TaxCalculator">
+            <argument type="service" id="Parthenon\Billing\Tax\CountryRulesInterface" />
+        </service>
+        <service id="Parthenon\Billing\Tax\TaxCalculatorInterface" alias="Parthenon\Billing\Tax\TaxCalculator" />
+
+        <!-- Payment Details -->
+        <service id="Parthenon\Billing\PaymentMethod\DefaultPaymentManager" class="Parthenon\Billing\PaymentMethod\DefaultPaymentManager">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentCardRepositoryInterface" />
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\BillingDetailsFactoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\PaymentMethod\DefaultPaymentManagerInterface" alias="Parthenon\Billing\PaymentMethod\DefaultPaymentManager" />
+
+        <service id="Parthenon\Billing\PaymentMethod\FrontendAddProcessor" class="Parthenon\Billing\PaymentMethod\FrontendAddProcessor">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\CustomerRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\CustomerConverterInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\PaymentMethodFactoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentCardRepositoryInterface" />
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface" />
+        </service>
+        <service id="Parthenon\Billing\PaymentMethod\FrontendAddProcessorInterface" alias="Parthenon\Billing\PaymentMethod\FrontendAddProcessor" />
+
+        <service id="Parthenon\Billing\PaymentMethod\Deleter" class="Parthenon\Billing\PaymentMethod\Deleter">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentCardRepositoryInterface" />
+        </service>
+        <service id="Parthenon\Billing\PaymentMethod\DeleterInterface" alias="Parthenon\Billing\PaymentMethod\Deleter" />
+
+
+        <service id="Parthenon\Billing\ChargeBack\ChargeBackSyncer" class="Parthenon\Billing\ChargeBack\ChargeBackSyncer">
+            <argument type="service" id="Parthenon\Billing\Repository\ChargeBackRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactory" />
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface" />
+        </service>
+        <service id="Parthenon\Billing\ChargeBack\ChargeBackSyncerInterface" alias="Parthenon\Billing\ChargeBack\ChargeBackSyncer" />
+
+        <!--- Subscriptions -->
+        <service id="Parthenon\Billing\Subscription\SubscriptionManager" class="Parthenon\Billing\Subscription\SubscriptionManager">
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentCardRepositoryInterface" />
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\BillingDetailsFactoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\PaymentFactoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Obol\SubscriptionFactoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\PlanManagerInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionPlanRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\PriceRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Factory\EntityFactoryInterface" />
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface" />
+        </service>
+        <service id="Parthenon\Billing\Subscription\SubscriptionManagerInterface" alias="Parthenon\Billing\Subscription\SubscriptionManager" />
+
+        <service id="Parthenon\Billing\Subscription\PaymentLinker" class="Parthenon\Billing\Subscription\PaymentLinker">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" />
+            <call method="setLogger">
+                <argument type="service" id="logger" />
+            </call>
+        </service>
+        <service id="Parthenon\Billing\Subscription\PaymentLinkerInterface" alias="Parthenon\Billing\Subscription\PaymentLinker" />
+
+        <service id="Parthenon\Billing\Plan\CustomerPlanInfo" class="Parthenon\Billing\Plan\CustomerPlanInfo">
+            <argument type="service" id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Plan\PlanManager" />
+        </service>
+        <service id="Parthenon\Billing\Plan\CustomerPlanInfoInterface" alias="Parthenon\Billing\Plan\CustomerPlanInfo" />
+
+        <service id="Parthenon\Billing\Subscription\ObolScheduler" class="Parthenon\Billing\Subscription\ObolScheduler">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+        </service>
+        <service id="Parthenon\Billing\Subscription\SchedulerInterface" alias="Parthenon\Billing\Subscription\ObolScheduler" />
+
+        <!--- Refund -->
+        <service id="Parthenon\Billing\Refund\RefundManager" class="Parthenon\Billing\Refund\RefundManager">
+            <argument type="service" id="Obol\Provider\ProviderInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\PaymentRepositoryInterface" />
+            <argument type="service" id="Parthenon\Billing\Repository\RefundRepositoryInterface" />
+            <argument type="service" id="Symfony\Component\EventDispatcher\EventDispatcherInterface" />
+        </service>
+        <service id="Parthenon\Billing\Refund\RefundManagerInterface" alias="Parthenon\Billing\Refund\RefundManager" />
+
+    </services>
+</container>

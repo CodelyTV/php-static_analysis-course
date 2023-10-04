@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Parthenon\Billing\Repository\PaymentCardRepositoryInterface" alias="parthenon.billing.repository.payment_card_repository" />
+        <service id="parthenon.billing.repository.payment_card_repository" class="Parthenon\Billing\Repository\Orm\PaymentCardRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.payment_card_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.payment_card_repository_doctrine" class="Parthenon\Billing\Repository\Orm\PaymentCardServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.payment_card_repository_doctrine" id="Parthenon\Billing\Repository\Orm\PaymentCardServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\PaymentRepositoryInterface" alias="parthenon.billing.repository.payment_repository" />
+        <service id="parthenon.billing.repository.payment_repository" class="Parthenon\Billing\Repository\Orm\PaymentRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.payment_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.payment_repository_doctrine" class="Parthenon\Billing\Repository\Orm\PaymentServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.payment_repository_doctrine" id="Parthenon\Billing\Repository\Orm\PaymentServiceRepository" />
+
+
+        <service id="Parthenon\Billing\Repository\SubscriptionPlanRepositoryInterface" alias="parthenon.billing.repository.subscription_plan_repository" />
+        <service id="parthenon.billing.repository.subscription_plan_repository" class="Parthenon\Billing\Repository\Orm\SubscriptionPlanRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.subscription_plan_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.subscription_plan_repository_doctrine" class="Parthenon\Billing\Repository\Orm\SubscriptionPlanServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.subscription_plan_repository_doctrine" id="Parthenon\Billing\Repository\Orm\SubscriptionPlanServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\SubscriptionRepositoryInterface" alias="parthenon.billing.repository.subscription_repository" />
+        <service id="parthenon.billing.repository.subscription_repository" class="Parthenon\Billing\Repository\Orm\SubscriptionRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.subscription_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.subscription_repository_doctrine" class="Parthenon\Billing\Repository\Orm\SubscriptionServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.subscription_repository_doctrine" id="Parthenon\Billing\Repository\Orm\SubscriptionServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\SubscriptionFeatureRepositoryInterface" alias="parthenon.billing.repository.subscription_feature_repository" />
+        <service id="parthenon.billing.repository.subscription_feature_repository" class="Parthenon\Billing\Repository\Orm\SubscriptionFeatureRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.subscription_feature_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.subscription_feature_repository_doctrine" class="Parthenon\Billing\Repository\Orm\SubscriptionFeatureServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.subscription_feature_repository_doctrine" id="Parthenon\Billing\Repository\Orm\SubscriptionFeatureServiceRepository" />
+
+
+        <service id="Parthenon\Billing\Repository\PriceRepositoryInterface" alias="parthenon.billing.repository.price_repository" />
+        <service id="parthenon.billing.repository.price_repository" class="Parthenon\Billing\Repository\Orm\PriceRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.price_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.price_repository_doctrine" class="Parthenon\Billing\Repository\Orm\PriceServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.price_repository_doctrine" id="Parthenon\Billing\Repository\Orm\PriceServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\ProductRepositoryInterface" alias="parthenon.billing.repository.product_repository" />
+        <service id="parthenon.billing.repository.product_repository" class="Parthenon\Billing\Repository\Orm\ProductRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.product_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.product_repository_doctrine" class="Parthenon\Billing\Repository\Orm\ProductServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.product_repository_doctrine" id="Parthenon\Billing\Repository\Orm\ProductServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\RefundRepositoryInterface" alias="parthenon.billing.repository.refund_repository" />
+        <service id="parthenon.billing.repository.refund_repository" class="Parthenon\Billing\Repository\Orm\RefundRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.refund_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.refund_repository_doctrine" class="Parthenon\Billing\Repository\Orm\RefundServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.refund_repository_doctrine" id="Parthenon\Billing\Repository\Orm\RefundServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\ChargeBackRepositoryInterface" alias="parthenon.billing.repository.charge_back_repository" />
+        <service id="parthenon.billing.repository.charge_back_repository" class="Parthenon\Billing\Repository\Orm\ChargeBackRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.charge_back_repository_doctrine" />
+        </service>
+        <service id="parthenon.billing.repository.orm.charge_back_repository_doctrine" class="Parthenon\Billing\Repository\Orm\ChargeBackServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service alias="parthenon.billing.repository.orm.charge_back_repository_doctrine" id="Parthenon\Billing\Repository\Orm\ChargeBackServiceRepository" />
+
+        <service id="Parthenon\Billing\Repository\ReceiptRepositoryInterface" alias="parthenon.billing.repository.receipt_repository" />
+        <service id="parthenon.billing.repository.receipt_repository" class="Parthenon\Billing\Repository\Orm\ReceiptRepository">
+            <argument type="service" id="parthenon.billing.repository.orm.receipt_repository_doctrine" />
+        </service>
+        <service id="Parthenon\Billing\Repository\Orm\ReceiptServiceRepository" class="Parthenon\Billing\Repository\Orm\ReceiptServiceRepository">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+        </service>
+        <service id="parthenon.billing.repository.orm.receipt_repository_doctrine" alias="Parthenon\Billing\Repository\Orm\ReceiptServiceRepository" />
+    </services>
+</container>

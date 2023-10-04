@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <mapped-superclass name="Parthenon\Billing\Entity\SubscriptionPlan">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM" />
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
+        </id>
+
+        <field name="public" column="public" type="boolean" nullable="false"  />
+        <field name="name" column="name" type="string" nullable="false"  />
+        <field name="codeName" column="code_name" type="string" nullable="true" unique="true" />
+        <field name="externalReference" column="external_reference" type="string" nullable="true"  />
+        <field name="paymentProviderDetailsLink" column="payment_provider_details_url" type="string" nullable="true"  />
+        <field name="perSeat" column="per_seat" type="boolean" nullable="true"  />
+        <field name="free" column="is_free" type="boolean" nullable="true"  />
+        <field name="userCount" column="user_count" type="integer" nullable="true"  />
+        <field name="hasTrial" column="has_trial" type="boolean" nullable="true"  />
+        <field name="trialLengthDays" column="trial_length_days" type="integer" nullable="true"  />
+        <many-to-one field="product" target-entity="Parthenon\Billing\Entity\ProductInterface" />
+        <one-to-many field="limits" target-entity="Parthenon\Billing\Entity\SubscriptionPlanLimit" mapped-by="subscriptionPlan" orphan-removal="true">
+            <cascade>
+                <cascade-persist />
+                <cascade-remove />
+            </cascade>
+        </one-to-many>
+        <many-to-many field="features" target-entity="Parthenon\Billing\Entity\SubscriptionFeature" orphan-removal="true">
+            <join-table name="subscription_plan_subscription_feature">
+                <join-columns>
+                    <join-column name="subscription_plan_id" referenced-column-name="id" />
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="subscription_feature_id" referenced-column-name="id" />
+                </inverse-join-columns>
+            </join-table>
+            <cascade>
+                <cascade-persist />
+                <cascade-remove />
+            </cascade>
+        </many-to-many>
+        <many-to-many field="prices" target-entity="Parthenon\Billing\Entity\PriceInterface" orphan-removal="true" >
+            <join-table name="subscription_plan_price">
+                <join-columns>
+                    <join-column name="subscription_plan_id" referenced-column-name="id" />
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="price_id" referenced-column-name="id" />
+                </inverse-join-columns>
+            </join-table>
+            <cascade>
+                <cascade-persist />
+                <cascade-remove />
+            </cascade>
+        </many-to-many>
+    </mapped-superclass>
+</doctrine-mapping>
